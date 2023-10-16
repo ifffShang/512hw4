@@ -730,35 +730,35 @@ bool Grammar::assignment(std::string idName)
 		&& parse->curToken()
 		&& parse->curToken()->getSymType() == Token::SYMTYPE_EQUAL)
 	{
-		std::string assignmentStmt;
+		std::string assignment;
 		if (parse->nextToken() && expression(&root))
 		{
 			if (parse->curToken()->getSymType() == Token::SYMTYPE_SEMICOLON)
 			{
-				assignmentStmt.append(idUseStmt);
-				assignmentStmt.append(" = ");
+				assignment.append(idUseStmt);
+				assignment.append(" = ");
 				if (root->type == ASTNode::OPERATION)
 				{
 					parse->evaluateASTTree(root);
 					if (root->left != NULL)
 					{
-						assignmentStmt.append(root->left->value);
-						assignmentStmt.append(" ");
+						assignment.append(root->left->value);
+						assignment.append(" ");
 					}
-					assignmentStmt.append(root->value);
-					assignmentStmt.append(" ");
+					assignment.append(root->value);
+					assignment.append(" ");
 					if (root->right != NULL)
 					{
-						assignmentStmt.append(root->right->value);
+						assignment.append(root->right->value);
 					}
 				}
 				else
 				{
 					parse->evaluateASTTree(root);
-					assignmentStmt.append(root->value);
+					assignment.append(root->value);
 				}
-				assignmentStmt.append(";");
-				parse->getSymbolTable()->curFunction->funcStats.push(assignmentStmt);
+				assignment.append(";");
+				parse->getSymbolTable()->curFunction->funcStats.push(assignment);
 				parse->nextToken();
 				delete root;
 				return true;
@@ -874,20 +874,20 @@ bool Grammar::ifStatement()
 		&& parse->curToken()->getSymType() == Token::SYMTYPE_RIGHT_PARENTHESIS)
 	{
 		parse->evaluateASTTree(root);
-		int thenLable = parse->getSymbolTable()->lableCnt++;
-		int endLable = parse->getSymbolTable()->lableCnt++;
+		int then = parse->getSymbolTable()->lableCnt++;
+		int end = parse->getSymbolTable()->lableCnt++;
 		
-		Util::printIfStmt(parse->getSymbolTable(), root, thenLable, endLable);
+		Util::printIfStmt(parse->getSymbolTable(), root, then, end);
 
 		delete root;
 		parse->nextToken();
 		if (blockStatements())
 		{
 			std::string ifGotoStmt("goto c");
-			ifGotoStmt.append(Util::to_string(thenLable));
+			ifGotoStmt.append(Util::to_string(then));
 			ifGotoStmt.push_back(';');
 			std::string endLableStmt("c");
-			endLableStmt.append(Util::to_string(endLable));
+			endLableStmt.append(Util::to_string(end));
 			endLableStmt.append(":;");
 			parse->getSymbolTable()->curFunction->funcStats.push(endLableStmt);
 			return true;
